@@ -1,0 +1,66 @@
+1 - Install Rust nightly compiler:
+
+rustup toolchain install nightly
+
+2 - Install Scoop via PowerShell:
+
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+irm get.scoop.sh | iex
+
+3 - Install avr-gcc and avrdude using Scoop:
+
+scoop install avr-gcc
+scoop install avrdude
+
+4 - Install ravedude for flashing the microcontroller:
+
+cargo +stable install ravedude
+
+5 - Create a new project using cargo-generate:
+
+cargo install cargo-generate
+cargo generate --git https://github.com/Rahix/avr-hal-template.git
+
+6 - Navigate into the project directory and open the folder in your preferred code editor.
+
+7 - Edit the main.rs file to include your desired program.
+
+main.rs
+
+#![no_std]
+#![no_main]
+
+use panic_halt as _;
+use arduino_uno::prelude::*;
+
+#[arduino_uno::entry]
+fn main() -> ! {
+    let dp = arduino_uno::Peripherals::take().unwrap();
+    let mut pins = arduino_uno::Pins::new(dp.PORTB, dp.PORTC, dp.PORTD);
+    let mut led = pins.d13.into_output(&mut pins.ddr);
+    loop {
+        led.toggle().void_unwrap();
+        arduino_uno::delay_ms(1000);
+        //Or Your Other Code Here
+    }
+}
+
+Cargo.toml
+[dependencies]
+arduino_uno = "0.2"
+
+8 - Build the project:
+
+cargo build
+
+9 - Connect your Arduino board to your computer via USB.
+
+10 - Set the serial com port for ravedude (replace COMx with the actual port number):
+
+$env:RAVEDUDE_PORT="COMx"
+
+11 - Build and flash the program into the Arduino:
+
+cargo run
+
+12 - After these steps, the Arduino should execute the program as intended.
